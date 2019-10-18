@@ -19,62 +19,74 @@ void setup() {
   if (debug) {
     Serial.begin(115200);
   }
-  setup_wifi();
+  setupWifi();
   client.setServer(MQTT_BROKER_IP, MQTT_BROKER_PORT);
 }
 
 void loop() {
 
   if (!client.connected()) {
-    reconnectMqtt
+    reconnectMqtt();
   }
   client.loop();
 
   snprintf (msg, 50, "Alive since %ld milliseconds", millis());
-  debug("Publish message: ");
-  debugln(msg);
+  debugPrint("Publish message: ");
+  debugPrintln(msg);
   client.publish("/home/data", "Hello World");
   delay(5000);
 }
 
 void setupWifi() {
   delay(10);
-  debugln();
-  debug("Connecting to ");
-  debugln(SSID);
+  debugPrintln("");
+  debugPrint("Connecting to ");
+  debugPrintln(SSID);
 
   WiFi.begin(SSID, PSK);
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    debug(".");
+    debugPrint(".");
   }
 
-  debugln("");
-  debugln("WiFi connected");
-  debugln("IP address: ");
-  debugln(WiFi.localIP());
+  debugPrintln("");
+  debugPrintln("WiFi connected");
+  debugPrintln("IP address: ");
+  debugPrintln("" + WiFi.localIP());
 }
 
 void reconnectMqtt() {
   while (!client.connected()) {
-    debug("Reconnecting...");
+    debugPrint("Reconnecting...");
     if (!client.connect("ESP8266Client")) {
-      debug("failed, rc=");
-      debug(client.state());
-      debugln(" retrying in 5 seconds");
+      debugPrint("failed, rc=");
+      debugPrint("" + client.state());
+      debugPrintln(" retrying in 5 seconds");
       delay(5000);
     }
   }
 }
 
-void debug(char* message) {
+void debugPrint(char* message) {
   if (debug) {
     Serial.print(message);
   }
 }
 
-void debugln(char* message) {
+void debugPrint(const char* message) {
+  if (debug) {
+    Serial.print(message);
+  }
+}
+
+void debugPrintln(char* message) {  
+  if (debug) {
+    Serial.println(message);
+  }
+}
+
+void debugPrintln(const char* message) {
   if (debug) {
     Serial.println(message);
   }
